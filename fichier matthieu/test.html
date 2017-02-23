@@ -51,9 +51,16 @@
                     if (evt.target.readyState == FileReader.DONE) { // DONE == 2
                         content = evt.target.result;
                         console.log('name : ' + name);
+                        console.log('type : ' + type);
                         console.log('size : ' + size);
                         console.log('lastModifiedDate : ' + lastModifiedDate);
                         console.log('content : ' + content);
+                        var n = type.indexOf('image');
+                        if(n != -1) {
+                            var img = document.createElement('img');
+                            img.src = 'data:image/jpeg;base64,' + btoa(content);
+                            document.body.appendChild(img);
+                        }  
                     }
                 };
                 var blob = f.slice(start, stop + 1);
