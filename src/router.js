@@ -16,9 +16,10 @@ const router = new VueRouter({
       name: 'Home',
     },
     {
-      path: '/garment/:id',
+      path: '/garment/:user/:repo',
       component: GarmentDetail,
       name: 'Garment Detail',
+      props: true,
     },
     {
       path: '/create',

@@ -1,4 +1,5 @@
 <template>
+
   <div class="garment-detail">
     <h2 class="garment-detail__title">{{garment.title}}</h2>
     <div class="mdc-layout-grid">
@@ -99,36 +100,41 @@
     filters: {
       moment: date => moment(date).format('L'),
     },
+    props : 
+        ['user', 'repo']
+    ,
+    mounted() {
+        var gh = new GitHub({
+           token: 'd8456e252da904dc11c6fd5bcb52f352d561719a'
+        });
+
+        var remoteRepo = gh.getRepo(this.user, this.repo);
+
+        remoteRepo.getContents('master', "info.json", true, (err, content) => {
+            // console.log(content);
+            this.garment = content;
+
+            console.log(this.garment);
+
+        });            
+    }
   };
+
+    
 </script>
 
 <style>
-    .garment-detail__label {
+    .garment-detail__info-box {
+        padding: 15px 0;
+    }
+
+    .garment-detail__info-box:not(:last-of-type) {
+        border-bottom: 1px solid grey;
+    }
+
+    .garment-detail__info-value {
         display: block;
-        margin-bottom: 10px;
-        font-size: 1.2rem;
-        font-weight: 600;
-    }
-
-    .garment-detail__project-info {
-        padding: 20px;
-        border: 1px solid grey;
-    }
-
-    .garment-detail__commit-value {
-        margin-right:5px;
-        font-weight: 600;
-    }
-
-    .garment-detail__description,
-    .garment-detail__download {
-        margin: 25px 0;
-    }
-
-    .garment-detail__description-label,
-    .garment-detail__download-label {
-        margin-bottom: 15px;
-        font-size: 1.2rem;
-        font-weight: 600;
+        font-size: 2.4rem;
+        font-weight: bold;
     }
 </style>
