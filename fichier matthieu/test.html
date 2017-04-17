@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta description="">
+        <!-- just github-api source (5.3kb) -->
+        <script src="https://unpkg.com/github-api/dist/GitHub.min.js"></script>
+
+        <!-- standalone (20.3kb) -->
+        <script src="https://unpkg.com/github-api/dist/GitHub.bundle.min.js"></script>
+        <script src="bundle.js"></script>
+        <style>
+            #drop_zone {
+            border:2px solid grey;
+            min-height:100px;
+            }
+        </style>
+        <title>Test Fashion</title>
+    </head>
+
+    <body>
+
+    <div id="drop_zone">Drop files here</div>
+    <span class="readBytesButtons">
+        <button>entire file</button>
+    </span>
+    <div id="byte_range"></div>
+    <div id="byte_content"></div>
+    <output id="list"></output>
+
+    <script>
+        function handleFileSelect(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+
+            var files = evt.dataTransfer.files; // FileList object.
+
+            // files is a FileList of File objects. List some properties.
+            var output = [];
+            for (var i = 0, f; f = files[i]; i++) {
+                var start = 0;
+                var stop = f.size - 1;
+                var content;
+                var reader = new FileReader();
+                var name = f.name;
+                var type = f.type;
+                var size = f.size;
+                var lastModifiedDate = f.lastModifiedDate;
+                // If we use onloadend, we need to check the readyState.
+                reader.onloadend = function(evt) {
+                    if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+                        content = evt.target.result;
+                        console.log('name : ' + name);
+                        console.log('type : ' + type);
+                        console.log('size : ' + size);
+                        console.log('lastModifiedDate : ' + lastModifiedDate);
+                        console.log('content : ' + content);
+                        var n = type.indexOf('image');
+                        if(n != -1) {
+                            var img = document.createElement('img');
+                            img.src = 'data:image/jpeg;base64,' + btoa(content);
+                            document.body.appendChild(img);
+                        }  
+                    }
+                };
+                var blob = f.slice(start, stop + 1);
+                reader.readAsBinaryString(blob);
+            }          
+        }
+
+        function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy';
+        }
+
+        var dropZone = document.getElementById('drop_zone');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
+    </script>
+    </body>
+</html>
