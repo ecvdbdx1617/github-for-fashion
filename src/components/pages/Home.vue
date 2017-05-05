@@ -9,7 +9,7 @@
 
 <script>
   import axios from 'axios';
-
+  import LoginStore from '../../loginStore';
   import EventBus from '../../eventBus';
 
   import Card from '../components/Card.vue';
@@ -36,21 +36,33 @@
           this.garments = response.data;
         })
         .catch(error => this.showError(error.message));
+      
+      const gh = new GitHub({
+        token: LoginStore.state.token,
+      });
+
+      const me = gh.getUser();
+
+      const remoteRepo = gh.getRepo('ecvdbdx1617', 'github-for-fashion');
+      
       const vm = this;
-      fetch('https://raw.githubusercontent.com/ecvdbdx1617/github-for-fashion/master/content/cover.json')
-      .then(
-        (response) => {
-          if (response.status !== 200) {
-            console.log(response.status);
-            return;
-          }
-          response.json().then((data) => {
-            vm.mainCard.title = data.primary.user;
-          });
-        },
-      )
-      .catch((err) => {
-        console.log('Fetch Error :-S', err);
+
+      remoteRepo.getContents('master', 'content/cover.json', false).then(function(file) {
+        let myJson = decodeURIComponent(escape(window.atob( file.data.content )));
+        myJson = JSON.parse(myJson);
+        Object.keys(myJson).forEach(function(key) {
+            let user;
+            let repo;
+            if (key === 'primary') {
+              [user, repo] = String(myJson.primary).split('/');
+              // Faire l'action nécessaire pour le primary
+            } else {
+              Object.keys(myJson.secondary).forEach(function(key) {
+                [user, repo] = String(myJson.secondary[key]).split('/');
+                // Faire l'action nécessaire pour chaque item du secondary
+              });
+            }
+        });
       });
     },
     methods: {
