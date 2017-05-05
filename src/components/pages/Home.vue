@@ -36,32 +36,31 @@
           this.garments = response.data;
         })
         .catch(error => this.showError(error.message));
-      
       const gh = new GitHub({
         token: LoginStore.state.token,
       });
 
-      const me = gh.getUser();
-
       const remoteRepo = gh.getRepo('ecvdbdx1617', 'github-for-fashion');
-      
-      const vm = this;
-
-      remoteRepo.getContents('master', 'content/cover.json', false).then(function(file) {
-        let myJson = decodeURIComponent(escape(window.atob( file.data.content )));
+      // const vm = this;         this will be usefull later
+      remoteRepo.getContents('master', 'content/cover.json', false).then((file) => {
+        let myJson = decodeURIComponent(escape(window.atob(file.data.content)));
         myJson = JSON.parse(myJson);
-        Object.keys(myJson).forEach(function(key) {
-            let user;
-            let repo;
-            if (key === 'primary') {
-              [user, repo] = String(myJson.primary).split('/');
-              // Faire l'action nécessaire pour le primary
-            } else {
-              Object.keys(myJson.secondary).forEach(function(key) {
-                [user, repo] = String(myJson.secondary[key]).split('/');
-                // Faire l'action nécessaire pour chaque item du secondary
-              });
-            }
+        Object.keys(myJson).forEach((key) => {
+          let user;
+          let repo;
+          if (key === 'primary') {
+            [user, repo] = String(myJson.primary).split('/');
+            console.log(user);
+            console.log(repo);
+            // We need to define the action we will execute with the user and repo from primary
+          } else {
+            Object.keys(myJson.secondary).forEach((secondaryKey) => {
+              [user, repo] = String(myJson.secondary[secondaryKey]).split('/');
+              console.log(user);
+              console.log(repo);
+              // We need to define the action we will execute for each user and repo from secondary
+            });
+          }
         });
       });
     },
