@@ -21,7 +21,7 @@
       return {
         garments: [],
         mainCard: {
-          title: 'Patron Jacket zero waste',
+          title: '',
           artist: 'BramyVony',
           description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam',
           img: 'https://www.outdoorresearch.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/244897_0936.jpg',
@@ -43,25 +43,17 @@
       const remoteRepo = gh.getRepo('ecvdbdx1617', 'github-for-fashion');
       // const vm = this;         this will be usefull later
       remoteRepo.getContents('master', 'content/cover.json', false).then((file) => {
-        let myJson = decodeURIComponent(escape(window.atob(file.data.content)));
+        let myJson = atob(file.data.content);
         myJson = JSON.parse(myJson);
-        Object.keys(myJson).forEach((key) => {
-          let user;
-          let repo;
-          if (key === 'primary') {
-            [user, repo] = String(myJson.primary).split('/');
-            console.log(user);
-            console.log(repo);
-            // We need to define the action we will execute with the user and repo from primary
-          } else {
-            Object.keys(myJson.secondary).forEach((secondaryKey) => {
-              [user, repo] = String(myJson.secondary[secondaryKey]).split('/');
-              console.log(user);
-              console.log(repo);
-              // We need to define the action we will execute for each user and repo from secondary
-            });
-          }
-        });
+        console.log(myJson);
+        let user;
+        let repo;
+        [user, repo] = String(myJson.primary).split('/');
+        console.log(user);
+        console.log(repo);
+        const primaryRepo =  gh.getRepo(user, repo);
+        const repoDetails = primaryRepo.getDetails();
+        console.log(repoDetails);
       });
     },
     methods: {
