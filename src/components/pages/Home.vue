@@ -58,14 +58,14 @@
           this.mainCard.contributor = primaryGarment.total;
         });
 
-        const garments = myJson.secondary.map( garment => {
-          let [user, repo] = garment.split('/');
-          let secondaryRepo = gh.getRepo(user, repo);
+        const garments = myJson.secondary.map((garment) => {
+          [user, repo] = garment.split('/');
+          const secondaryRepo = gh.getRepo(user, repo);
           console.log(user);
           console.log(repo);
           const promise = secondaryRepo.getDetails();
           return promise;
-        });     
+        });
         Promise.all(garments).then((response) => {
           console.log(response);
         });
@@ -81,16 +81,14 @@
       MainCard,
     },
   };
-  //  function allResolved(promises){    
+  //  function allResolved(promises){
   //   if(!Array.isArray(promises))
   //       throw new TypeError('promises is not an array');
-            
   //   var actuallyPromises = promises.map(function(v){
   //       return Promise.resolve(v);
   //   });
   //   var resolvedOrRejectedCount = 0;
-    
-  //   return Promise.all(actuallyPromises.map(function(p){        
+  //   return Promise.all(actuallyPromises.map(function(p){
   //       return p.then(function(res){
   //               resolvedOrRejectedCount++;
   //               return res;
