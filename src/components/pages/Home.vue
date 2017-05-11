@@ -45,7 +45,7 @@
       remoteRepo.getContents('master', 'content/cover.json', false).then((file) => {
         let myJson = atob(file.data.content);
         myJson = JSON.parse(myJson);
-        const [user, repo] = myJson.primary.split('/');
+        let [user, repo] = myJson.primary.split('/');
         const primaryRepo = gh.getRepo(user, repo);
         primaryRepo.getDetails().then((response) => {
           const primaryGarment = response.data;
@@ -56,6 +56,18 @@
         primaryRepo.getContributorStats().then((response) => {
           const primaryGarment = response.data[0];
           this.mainCard.contributor = primaryGarment.total;
+        });
+
+        const garments = myJson.secondary.map( garment => {
+          let [user, repo] = garment.split('/');
+          let secondaryRepo = gh.getRepo(user, repo);
+          console.log(user);
+          console.log(repo);
+          const promise = secondaryRepo.getDetails();
+          return promise;
+        });     
+        Promise.all(garments).then((response) => {
+          console.log(response);
         });
       });
     },
@@ -69,6 +81,25 @@
       MainCard,
     },
   };
+  //  function allResolved(promises){    
+  //   if(!Array.isArray(promises))
+  //       throw new TypeError('promises is not an array');
+            
+  //   var actuallyPromises = promises.map(function(v){
+  //       return Promise.resolve(v);
+  //   });
+  //   var resolvedOrRejectedCount = 0;
+    
+  //   return Promise.all(actuallyPromises.map(function(p){        
+  //       return p.then(function(res){
+  //               resolvedOrRejectedCount++;
+  //               return res;
+  //           })
+  //           .catch(function(){
+  //               resolvedOrRejectedCount++;
+  //               return undefined; // move to "resolve channel"
+  //           });
+  //   }));
 </script>
 
 <style>
