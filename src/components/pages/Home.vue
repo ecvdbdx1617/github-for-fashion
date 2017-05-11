@@ -45,12 +45,8 @@
       remoteRepo.getContents('master', 'content/cover.json', false).then((file) => {
         let myJson = atob(file.data.content);
         myJson = JSON.parse(myJson);
-        /* eslint-disable prefer-const */
-        /* eslint-disable no-unused-vars */
-        let user = '';
-        let repo = '';
-        [user, repo] = String(myJson.primary).split('/');
-        const primaryRepo = gh.getRepo('matthieu-brillaxis', 'test');
+        const [user, repo] = myJson.primary.split('/');
+        const primaryRepo = gh.getRepo(user, repo);
         primaryRepo.getDetails().then((response) => {
           const primaryGarment = response.data;
           this.mainCard.title = primaryGarment.name;
