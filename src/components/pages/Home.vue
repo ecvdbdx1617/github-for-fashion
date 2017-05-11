@@ -8,10 +8,10 @@
 </template>
 
 <script>
+  import Github from 'github-api';
   import axios from 'axios';
   import LoginStore from '../../loginStore';
   import EventBus from '../../eventBus';
-
   import Card from '../components/Card.vue';
   import MainCard from '../components/MainCard.vue';
 
@@ -22,11 +22,10 @@
         garments: [],
         mainCard: {
           title: '',
-          artist: 'BramyVony',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam',
+          artist: '',
+          description: '',
           img: 'https://www.outdoorresearch.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/244897_0936.jpg',
-          location: 'Bordeaux - France',
-          contributor: 2,
+          contributor: '',
         },
       };
     },
@@ -36,25 +35,32 @@
           this.garments = response.data;
         })
         .catch(error => this.showError(error.message));
-      const gh = new GitHub({
+    },
+    mounted() {
+      const gh = new Github({
         token: LoginStore.state.token,
       });
 
       const remoteRepo = gh.getRepo('ecvdbdx1617', 'github-for-fashion');
-      // const vm = this;         this will be usefull later
       remoteRepo.getContents('master', 'content/cover.json', false).then((file) => {
         let myJson = atob(file.data.content);
         myJson = JSON.parse(myJson);
-        console.log(myJson);
         /* eslint-disable prefer-const */
-        let user;
-        let repo;
+        /* eslint-disable no-unused-vars */
+        let user = '';
+        let repo = '';
         [user, repo] = String(myJson.primary).split('/');
-        console.log(user);
-        console.log(repo);
-        const primaryRepo = gh.getRepo(user, repo);
-        const repoDetails = primaryRepo.getDetails();
-        console.log(repoDetails);
+        const primaryRepo = gh.getRepo('matthieu-brillaxis', 'test');
+        primaryRepo.getDetails().then((response) => {
+          const primaryGarment = response.data;
+          this.mainCard.title = primaryGarment.name;
+          this.mainCard.artist = primaryGarment.owner.login;
+          this.mainCard.description = primaryGarment.description;
+        });
+        primaryRepo.getContributorStats().then((response) => {
+          const primaryGarment = response.data[0];
+          this.mainCard.contributor = primaryGarment.total;
+        });
       });
     },
     methods: {
