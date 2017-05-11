@@ -46,12 +46,13 @@
         let myJson = atob(file.data.content);
         myJson = JSON.parse(myJson);
         console.log(myJson);
+        /* eslint-disable prefer-const */
         let user;
         let repo;
         [user, repo] = String(myJson.primary).split('/');
         console.log(user);
         console.log(repo);
-        const primaryRepo =  gh.getRepo(user, repo);
+        const primaryRepo = gh.getRepo(user, repo);
         const repoDetails = primaryRepo.getDetails();
         console.log(repoDetails);
       });
