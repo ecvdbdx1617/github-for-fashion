@@ -70,13 +70,11 @@
 </template>
 
 <script>
+  import { mapActions, mapGetters } from 'vuex';
   import moment from 'moment';
   import Github from 'github-api';
   import mime from 'mime-types';
   import _ from 'lodash';
-
-  import EventBus from '../../eventBus';
-  import LoginStore from '../../loginStore';
 
   import InfoBox from '../components/InfoBox.vue';
   import DownloadBox from '../components/DownloadBox.vue';
@@ -112,13 +110,18 @@
           files: [],
         },
         dataIsLoaded: false,
-        login: LoginStore.state.login,
       };
     },
+    computed: {
+      ...mapGetters({
+        token: 'token',
+        login: 'login',
+      }),
+    },
     methods: {
-      showError(error) {
-        EventBus.$emit('showError', error);
-      },
+      ...mapActions({
+        showError: 'showError',
+      }),
       formatRepoDetails(repoDetails) {
         this.garment.title = repoDetails.name;
         this.garment.creator = repoDetails.owner.login;
@@ -171,7 +174,7 @@
     props: ['user', 'repo'],
     mounted() {
       const gh = new Github({
-        token: LoginStore.state.token,
+        token: this.token,
       });
 
       const remoteRepo = gh.getRepo(this.user, this.repo);
@@ -194,7 +197,7 @@
 
           this.dataIsLoaded = true;
         })
-        .catch(error => this.showError(error.message));
+        .catch(error => this.showError({ message: error.message }));
     },
   };
 </script>

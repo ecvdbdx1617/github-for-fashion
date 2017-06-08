@@ -4,6 +4,7 @@ import * as mdc from 'material-components-web/dist/material-components-web';
 
 import App from './App.vue';
 import router from './router';
+import store from './store/store';
 
 Vue.use(VueAnalytics, {
   id: 'UA-99008089-1',
@@ -16,6 +17,7 @@ new Vue({
   template: '<App/>',
   components: { App },
   router,
+  store,
 });
 
 mdc.autoInit();

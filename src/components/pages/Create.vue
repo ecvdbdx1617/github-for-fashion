@@ -27,10 +27,9 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex';
 import GitHub from 'github-api';
 
-import EventBus from '../../eventBus';
-import sessionStore from '../../loginStore';
 import router from '../../router';
 import * as Licences from '../../licences';
 import * as Types from '../../types';
@@ -54,13 +53,20 @@ export default {
         type: '',
         licence: Licences.CC_BY,
       },
-      state: sessionStore.state,
     };
   },
+  computed: {
+    ...mapGetters({
+      token: 'token',
+    }),
+  },
   methods: {
+    ...mapActions({
+      showError: 'showError',
+    }),
     sendGarment() {
       const gh = new GitHub({
-        token: this.state.token,
+        token: this.token,
       });
 
       const options = {
@@ -100,13 +106,13 @@ export default {
 
                       router.push({ name: 'Garment Detail', params: { user, repo } });
                     })
-                    .catch(error => EventBus.$emit('showError', error.message));
+                    .catch(error => this.showError({ message: error.message }));
                 })
-                .catch(error => EventBus.$emit('showError', error.message));
+                .catch(error => this.showError({ message: error.message }));
             })
-            .catch(error => EventBus.$emit('showError', error.message));
+            .catch(error => this.showError({ message: error.message }));
         })
-        .catch(error => EventBus.$emit('showError', error.message));
+        .catch(error => this.showError({ message: error.message }));
     },
   },
 };

@@ -8,9 +8,9 @@
 </template>
 
 <script>
+  import { mapActions, mapGetters } from 'vuex';
   import Github from 'github-api';
-  import LoginStore from '../../loginStore';
-  import EventBus from '../../eventBus';
+
   import Card from '../components/Card.vue';
   import MainCard from '../components/MainCard.vue';
 
@@ -28,9 +28,14 @@
         },
       };
     },
+    computed: {
+      ...mapGetters({
+        token: 'token',
+      }),
+    },
     beforeCreate() {
       const gh = new Github({
-        token: LoginStore.state.token,
+        token: this.token,
       });
 
       const remoteRepo = gh.getRepo('ecvdbdx1617', 'github-for-fashion');
@@ -71,9 +76,9 @@
       });
     },
     methods: {
-      showError(error) {
-        EventBus.$emit('showError', error);
-      },
+      ...mapActions({
+        showError: 'showError',
+      }),
     },
     components: {
       Card,

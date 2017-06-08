@@ -7,17 +7,17 @@
         <section class="mdc-toolbar__section mdc-toolbar__section--align-end" role="toolbar">
           <router-link :to="{name: 'Home'}" class="material-icons">home</router-link>
         </section>
-        <section v-if="state.name || state.login" class="mdc-toolbar__section mdc-toolbar__section--align-end" role="toolbar">
+        <section v-if="name || username" class="mdc-toolbar__section mdc-toolbar__section--align-end" role="toolbar">
           <router-link :to="{name: 'create'}" class="material-icons">add</router-link>
         </section>
-        <section v-if="state.name !== null" class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <router-link :to="{ name: 'Profil', params: {user: state.login}}">{{ state.name }}</router-link>
+        <section v-if="name" class="mdc-toolbar__section mdc-toolbar__section--align-start">
+          <router-link :to="{ name: 'Profil', params: {user: username}}">{{ name }}</router-link>
         </section>
-        <section v-if="state.name === null" class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <router-link :to="{ name: 'Profil', params: {user: state.login}}">{{ state.login }}</router-link>
+        <section v-if="!name" class="mdc-toolbar__section mdc-toolbar__section--align-start">
+          <router-link :to="{ name: 'Profil', params: {user: username}}">{{ username }}</router-link>
         </section>
-        <section v-if="state.name || state.login" class="mdc-toolbar__section mdc-toolbar__section--align-start">
-           <a @click.prevent="disconnect" href="#">Logout</a>
+        <section v-if="name || username" class="mdc-toolbar__section mdc-toolbar__section--align-start">
+           <a @click.prevent="logout" href="#">Logout</a>
         </section>
         <section v-else class="mdc-toolbar__section mdc-toolbar__section--align-start" id="login">
           <a @click.prevent="showLogin = true" href="#">Login</a>
@@ -25,6 +25,7 @@
           <div v-if="showLogin">
             <label>Paste your Token</label>
             <input type="text" v-model="logininput">
+            <button type="submit" @click.prevent="onLogin">Login</button>
           <div v-if="loader" class="loader_login"></div>
           <a class="link_login" href="https://github.com/settings/tokens" target="_blank">Where find it ?</a>
           <p>Info: When creating it, enable <code>public_repo</code> and <code>delete_repo</code> then paste your token.</p>
@@ -35,59 +36,31 @@
 </template>
 
 <script>
-import GitHub from 'github-api';
-
-import sessionStore from '../loginStore';
-
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'g-header',
   data() {
     return {
-      token: '',
-      state: sessionStore.state,
       showLogin: false,
       loader: false,
       logininput: '',
     };
   },
   computed: {
-    name() {
-      return this.state.name;
-    },
+    ...mapGetters({
+      username: 'login',
+      name: 'name',
+    }),
   },
   methods: {
-    disconnect() {
-      sessionStore.clearLogin();
-      this.state.name = '';
-      this.state.login = '';
+    ...mapActions({
+      login: 'login',
+      logout: 'logout',
+    }),
+    onLogin() {
+      this.login(this.logininput);
     },
-  },
-  watch: {
-    /* eslint-disable object-shorthand */
-    /* eslint-disable func-names */
-    logininput: function (val) {
-      const valTrim = val.trim();
-      if (valTrim.length >= 2) {
-        this.loader = true;
-        this.token = valTrim;
-
-        const gh = new GitHub({
-          token: valTrim,
-        });
-
-        gh.getUser().getProfile().then((user) => {
-          sessionStore.setLogin(valTrim, user.data.login, user.data.name);
-          this.state.name = user.data.name;
-          this.state.login = user.data.login;
-          this.showLogin = false;
-          this.loader = false;
-        });
-      }
-    },
-  },
-  mounted() {
-
   },
 };
 </script>
