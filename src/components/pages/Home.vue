@@ -9,7 +9,6 @@
 
 <script>
   import Github from 'github-api';
-  import axios from 'axios';
   import LoginStore from '../../loginStore';
   import EventBus from '../../eventBus';
   import Card from '../components/Card.vue';
@@ -30,13 +29,6 @@
       };
     },
     beforeCreate() {
-      axios.get('http://localhost:3000/garments/')
-        .then((response) => {
-          this.garments = response.data;
-        })
-        .catch(error => this.showError(error.message));
-    },
-    mounted() {
       const gh = new Github({
         token: LoginStore.state.token,
       });
@@ -61,13 +53,20 @@
         const garments = myJson.secondary.map((garment) => {
           [user, repo] = garment.split('/');
           const secondaryRepo = gh.getRepo(user, repo);
-          console.log(user);
-          console.log(repo);
           const promise = secondaryRepo.getDetails();
           return promise;
         });
         Promise.all(garments).then((response) => {
-          console.log(response);
+          response.forEach((element) => {
+            const card = {
+              creation_date: element.data.created_at,
+              creator: element.data.owner.login,
+              description: element.data.description,
+              id: element.data.id,
+              title: element.data.name,
+            };
+            this.garments.push(card);
+          });
         });
       });
     },
@@ -81,23 +80,6 @@
       MainCard,
     },
   };
-  //  function allResolved(promises){
-  //   if(!Array.isArray(promises))
-  //       throw new TypeError('promises is not an array');
-  //   var actuallyPromises = promises.map(function(v){
-  //       return Promise.resolve(v);
-  //   });
-  //   var resolvedOrRejectedCount = 0;
-  //   return Promise.all(actuallyPromises.map(function(p){
-  //       return p.then(function(res){
-  //               resolvedOrRejectedCount++;
-  //               return res;
-  //           })
-  //           .catch(function(){
-  //               resolvedOrRejectedCount++;
-  //               return undefined; // move to "resolve channel"
-  //           });
-  //   }));
 </script>
 
 <style>
