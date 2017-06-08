@@ -9,13 +9,13 @@
 
 <script>
   import { mapActions, mapGetters } from 'vuex';
-  
+
   export default {
     name: 'error',
     computed: {
       ...mapGetters({
         message: 'message',
-        active: 'active'
+        active: 'active',
       }),
     },
     methods: {

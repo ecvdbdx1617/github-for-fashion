@@ -61,7 +61,7 @@ export default {
   methods: {
     ...mapActions({
       addGarment: 'addGarment',
-      showError: 'showError'
+      showError: 'showError',
     }),
     deleteCard(id) {
       this.garments = _.reject(this.garments, { id });
