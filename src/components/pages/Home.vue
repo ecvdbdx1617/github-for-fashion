@@ -8,10 +8,9 @@
 </template>
 
 <script>
-  import axios from 'axios';
-
+  import Github from 'github-api';
+  import LoginStore from '../../loginStore';
   import EventBus from '../../eventBus';
-
   import Card from '../components/Card.vue';
   import MainCard from '../components/MainCard.vue';
 
@@ -21,36 +20,54 @@
       return {
         garments: [],
         mainCard: {
-          title: 'Patron Jacket zero waste',
-          artist: 'BramyVony',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam',
-          img: 'https://www.outdoorresearch.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/244897_0936.jpg',
-          location: 'Bordeaux - France',
-          contributor: 2,
+          title: '',
+          artist: '',
+          description: '',
+          img: '',
+          contributor: '',
         },
       };
     },
     beforeCreate() {
-      axios.get('http://localhost:3000/garments/')
-        .then((response) => {
-          this.garments = response.data;
-        })
-        .catch(error => this.showError(error.message));
-      const vm = this;
-      fetch('https://raw.githubusercontent.com/ecvdbdx1617/github-for-fashion/master/content/cover.json')
-      .then(
-        (response) => {
-          if (response.status !== 200) {
-            console.log(response.status);
-            return;
-          }
-          response.json().then((data) => {
-            vm.mainCard.title = data.primary.user;
+      const gh = new Github({
+        token: LoginStore.state.token,
+      });
+
+      const remoteRepo = gh.getRepo('ecvdbdx1617', 'github-for-fashion');
+      remoteRepo.getContents('master', 'content/cover.json', false).then((file) => {
+        let myJson = atob(file.data.content);
+        myJson = JSON.parse(myJson);
+        let [user, repo] = myJson.primary.split('/');
+        const primaryRepo = gh.getRepo(user, repo);
+        primaryRepo.getDetails().then((response) => {
+          const primaryGarment = response.data;
+          this.mainCard.title = primaryGarment.name;
+          this.mainCard.artist = primaryGarment.owner.login;
+          this.mainCard.description = primaryGarment.description;
+        });
+        primaryRepo.getContributorStats().then((response) => {
+          const primaryGarment = response.data[0];
+          this.mainCard.contributor = primaryGarment.total;
+        });
+
+        const garments = myJson.secondary.map((garment) => {
+          [user, repo] = garment.split('/');
+          const secondaryRepo = gh.getRepo(user, repo);
+          const promise = secondaryRepo.getDetails();
+          return promise;
+        });
+        Promise.all(garments).then((response) => {
+          response.forEach((element) => {
+            const card = {
+              creation_date: element.data.created_at,
+              creator: element.data.owner.login,
+              description: element.data.description,
+              id: element.data.id,
+              title: element.data.name,
+            };
+            this.garments.push(card);
           });
-        },
-      )
-      .catch((err) => {
-        console.log('Fetch Error :-S', err);
+        });
       });
     },
     methods: {

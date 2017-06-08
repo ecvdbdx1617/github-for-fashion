@@ -11,7 +11,6 @@
               <span>Par <a href="#" class="artist_link">{{ data.artist }}</a></span>
               <p>{{ data.description }}</p>
               <div class="mdc-layout-grid">
-                <span class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><i class="material-icons">place</i>{{ data.location }}</span>
                 <span class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"><i class="material-icons">supervisor_account</i>{{ data.contributor }} contributeur</span>
               </div>
             </section>
