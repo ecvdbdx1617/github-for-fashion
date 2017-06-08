@@ -24,13 +24,12 @@ export default {
       dataIsLoaded: false,
     };
   },
-  computed: {
-    ...mapGetters({
-      garments: 'garments',
-      token: 'token',
-    }),
-  },
+  computed: mapGetters({
+    garments: 'garments',
+    token: 'token',
+  }),
   mounted() {
+    this.clearGarments();
     const gh = new GitHub({
       token: this.token,
     });
@@ -58,15 +57,18 @@ export default {
     Card,
     Loader,
   },
-  methods: {
-    ...mapActions({
+  methods: Object.assign(
+    mapActions({
       addGarment: 'addGarment',
+      clearGarments: 'clearGarments',
       showError: 'showError',
     }),
-    deleteCard(id) {
-      this.garments = _.reject(this.garments, { id });
+    {
+      deleteCard(id) {
+        this.garments = _.reject(this.garments, { id });
+      },
     },
-  },
+  ),
 };
 </script>
 

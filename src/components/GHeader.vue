@@ -47,21 +47,21 @@ export default {
       logininput: '',
     };
   },
-  computed: {
-    ...mapGetters({
-      username: 'login',
-      name: 'name',
-    }),
-  },
-  methods: {
-    ...mapActions({
+  computed: mapGetters({
+    username: 'login',
+    name: 'name',
+  }),
+  methods: Object.assign(
+    mapActions({
       login: 'login',
       logout: 'logout',
     }),
-    onLogin() {
-      this.login(this.logininput);
+    {
+      onLogin() {
+        this.login(this.logininput);
+      },
     },
-  },
+  ),
 };
 </script>
 

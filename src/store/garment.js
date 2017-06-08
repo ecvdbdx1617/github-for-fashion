@@ -12,6 +12,9 @@ const mutations = {
   addGarment: (state, garment) => {
     state.garments.push(garment);
   },
+  clearGarments: (state) => {
+    state.garments = [];
+  },
 };
 
 const actions = {
@@ -27,6 +30,9 @@ const actions = {
       image: 'test',
     };
     context.commit('addGarment', garment);
+  },
+  clearGarments: (context) => {
+    context.commit('clearGarments');
   },
 };
 

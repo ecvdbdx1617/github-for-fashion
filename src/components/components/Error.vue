@@ -12,17 +12,13 @@
 
   export default {
     name: 'error',
-    computed: {
-      ...mapGetters({
-        message: 'message',
-        active: 'active',
-      }),
-    },
-    methods: {
-      ...mapActions({
-        hide: 'hideError',
-      }),
-    },
+    computed: mapGetters({
+      message: 'message',
+      active: 'active',
+    }),
+    methods: mapActions({
+      hide: 'hideError',
+    }),
   };
 </script>
 

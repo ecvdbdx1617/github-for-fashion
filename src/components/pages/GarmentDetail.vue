@@ -112,62 +112,62 @@
         dataIsLoaded: false,
       };
     },
-    computed: {
-      ...mapGetters({
-        token: 'token',
-        login: 'login',
-      }),
-    },
-    methods: {
-      ...mapActions({
+    computed: mapGetters({
+      token: 'token',
+      login: 'login',
+    }),
+    methods: Object.assign(
+      mapActions({
         showError: 'showError',
       }),
-      formatRepoDetails(repoDetails) {
-        this.garment.title = repoDetails.name;
-        this.garment.creator = repoDetails.owner.login;
-        this.garment.creation_date = repoDetails.created_at;
-        this.garment.reference = repoDetails.id;
-        this.garment.infos.push({
-          label: 'favourites',
-          value: repoDetails.watchers,
-        });
-      },
-      formatRepoContributorStats(contributors) {
-        const totalCommits = _.sumBy(contributors, contributor => contributor.total);
-
-        this.garment.commitChanges = totalCommits;
-        this.garment.contributors = contributors.length;
-      },
-      formatRepoContents(repoContents) {
-        this.garment.title = repoContents.title;
-        this.garment.type = repoContents.type;
-        this.garment.licence = repoContents.licence;
-        this.garment.status = repoContents.status;
-        this.garment.description = repoContents.description;
-        this.garment.infos.push({
-          label: 'category',
-          value: repoContents.category,
-        });
-        this.garment.infos.push({
-          label: 'sizes',
-          value: repoContents.sizes.join(' '),
-        });
-      },
-      formatRepoPullRequests(repoPullRequests) {
-        this.garment.numberOfProposals = repoPullRequests.length;
-      },
-      formatRepoReleases(repoReleases) {
-        if (repoReleases.length > 0) {
-          repoReleases[0].assets.forEach((asset) => {
-            this.garment.files.push({
-              filetype: mime.extension(asset.content_type),
-              url: asset.browser_download_url,
-              available: asset.state === 'uploaded',
-            });
+      {
+        formatRepoDetails(repoDetails) {
+          this.garment.title = repoDetails.name;
+          this.garment.creator = repoDetails.owner.login;
+          this.garment.creation_date = repoDetails.created_at;
+          this.garment.reference = repoDetails.id;
+          this.garment.infos.push({
+            label: 'favourites',
+            value: repoDetails.watchers,
           });
-        }
+        },
+        formatRepoContributorStats(contributors) {
+          const totalCommits = _.sumBy(contributors, contributor => contributor.total);
+
+          this.garment.commitChanges = totalCommits;
+          this.garment.contributors = contributors.length;
+        },
+        formatRepoContents(repoContents) {
+          this.garment.title = repoContents.title;
+          this.garment.type = repoContents.type;
+          this.garment.licence = repoContents.licence;
+          this.garment.status = repoContents.status;
+          this.garment.description = repoContents.description;
+          this.garment.infos.push({
+            label: 'category',
+            value: repoContents.category,
+          });
+          this.garment.infos.push({
+            label: 'sizes',
+            value: repoContents.sizes.join(' '),
+          });
+        },
+        formatRepoPullRequests(repoPullRequests) {
+          this.garment.numberOfProposals = repoPullRequests.length;
+        },
+        formatRepoReleases(repoReleases) {
+          if (repoReleases.length > 0) {
+            repoReleases[0].assets.forEach((asset) => {
+              this.garment.files.push({
+                filetype: mime.extension(asset.content_type),
+                url: asset.browser_download_url,
+                available: asset.state === 'uploaded',
+              });
+            });
+          }
+        },
       },
-    },
+    ),
     filters: {
       moment: date => moment(date).format('L'),
     },
