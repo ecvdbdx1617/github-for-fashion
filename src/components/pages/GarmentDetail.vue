@@ -70,13 +70,13 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex';
   import moment from 'moment';
   import Github from 'github-api';
   import mime from 'mime-types';
   import _ from 'lodash';
 
   import EventBus from '../../eventBus';
-  import LoginStore from '../../loginStore';
 
   import InfoBox from '../components/InfoBox.vue';
   import DownloadBox from '../components/DownloadBox.vue';
@@ -114,6 +114,11 @@
         dataIsLoaded: false,
         login: LoginStore.state.login,
       };
+    },
+    computed: {
+      ...mapGetters({
+        token: 'token',
+      }),
     },
     methods: {
       showError(error) {
@@ -171,7 +176,7 @@
     props: ['user', 'repo'],
     mounted() {
       const gh = new Github({
-        token: LoginStore.state.token,
+        token: this.token,
       });
 
       const remoteRepo = gh.getRepo(this.user, this.repo);
