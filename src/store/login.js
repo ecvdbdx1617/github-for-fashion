@@ -1,5 +1,5 @@
 import GitHub from 'github-api';
-import EventBus from '../eventBus';
+import store from './store';
 
 /* eslint-disable no-shadow */
 /* eslint-disable arrow-body-style */
@@ -44,7 +44,7 @@ const actions = {
         localStorage.setItem('name', name);
       })
       .catch((error) => {
-        EventBus.$emit('showError', error);
+        store.dispatch('showError', error.message);
       });
   },
   logout: (context) => {

@@ -23,11 +23,10 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import moment from 'moment';
 import GitHub from 'github-api';
 import router from '../../router';
-import EventBus from '../../eventBus';
 import DialogBox from './Dialog.vue';
 
 export default {
@@ -50,6 +49,9 @@ export default {
     }),
   },
   methods: {
+    ...mapActions({
+      showError: 'showError',
+    }),
     fork() {
       const gh = new GitHub({
         token: this.token,
@@ -59,7 +61,7 @@ export default {
       .then((response) => {
         router.push({ name: 'Garment Detail', params: { user: this.login, repo: response.data.name } });
       }).catch((error) => {
-        EventBus.$emit('showError', error);
+        this.showError({ message: error });
       });
     },
     remove() {
@@ -71,7 +73,7 @@ export default {
       .then(() => {
         this.$emit('cardDeleted', this.data.id);
       }).catch((error) => {
-        EventBus.$emit('showError', error);
+        this.showError({ message: error });
       });
     },
     declineDialog() {

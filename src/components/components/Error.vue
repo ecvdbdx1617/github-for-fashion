@@ -1,42 +1,27 @@
 <template>
-  <div class="mdc-snackbar" :class="{'mdc-snackbar--active': isActive}">
+  <div class="mdc-snackbar" :class="{'mdc-snackbar--active': active}">
     <div class="mdc-snackbar__text">{{ message }}</div>
     <div class="mdc-snackbar__action-wrapper">
-      <button type="button" class="mdc-button mdc-snackbar__action-button" v-on:click="hideErrorMessage">Close</button>
+      <button type="button" class="mdc-button mdc-snackbar__action-button" v-on:click="hide">Close</button>
     </div>
   </div>
 </template>
 
 <script>
-  import EventBus from '../../eventBus';
-
+  import { mapActions, mapGetters } from 'vuex';
+  
   export default {
     name: 'error',
-    data() {
-      return {
-        message: '',
-        isActive: false,
-        duration: 5000,
-      };
-    },
-    beforeCreate() {
-      const vm = this;
-      EventBus.$on('showError', (error) => {
-        vm.showErrorMessage(error);
-      });
+    computed: {
+      ...mapGetters({
+        message: 'message',
+        active: 'active'
+      }),
     },
     methods: {
-      showErrorMessage(error) {
-        this.isActive = true;
-        this.message = error;
-
-        setTimeout(() => {
-          this.isActive = false;
-        }, this.duration);
-      },
-      hideErrorMessage() {
-        this.isActive = false;
-      },
+      ...mapActions({
+        hide: 'hideError',
+      }),
     },
   };
 </script>

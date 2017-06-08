@@ -27,10 +27,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import GitHub from 'github-api';
 
-import EventBus from '../../eventBus';
 import router from '../../router';
 import * as Licences from '../../licences';
 import * as Types from '../../types';
@@ -62,6 +61,9 @@ export default {
     }),
   },
   methods: {
+    ...mapActions({
+      showError: 'showError',
+    }),
     sendGarment() {
       const gh = new GitHub({
         token: this.token,
@@ -106,11 +108,11 @@ export default {
                     })
                     .catch(error => EventBus.$emit('showError', error.message));
                 })
-                .catch(error => EventBus.$emit('showError', error.message));
+                .catch(error => this.showError({ message: error.message }));
             })
-            .catch(error => EventBus.$emit('showError', error.message));
+            .catch(error => this.showError({ message: error.message }));
         })
-        .catch(error => EventBus.$emit('showError', error.message));
+        .catch(error => this.showError({ message: error.message }));
     },
   },
 };

@@ -70,13 +70,11 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex';
+  import { mapActions, mapGetters } from 'vuex';
   import moment from 'moment';
   import Github from 'github-api';
   import mime from 'mime-types';
   import _ from 'lodash';
-
-  import EventBus from '../../eventBus';
 
   import InfoBox from '../components/InfoBox.vue';
   import DownloadBox from '../components/DownloadBox.vue';
@@ -121,9 +119,9 @@
       }),
     },
     methods: {
-      showError(error) {
-        EventBus.$emit('showError', error);
-      },
+      ...mapActions({
+        showError: 'showError',
+      }),
       formatRepoDetails(repoDetails) {
         this.garment.title = repoDetails.name;
         this.garment.creator = repoDetails.owner.login;
@@ -195,11 +193,13 @@
           this.formatRepoPullRequests(rPullRequests.data);
           this.formatRepoReleases(rReleases.data);
 
+          this.showError({ message: 'demo' });
+
           this.$ga.event('Garment', 'view', `${this.user}/${this.garment.title}`);
 
           this.dataIsLoaded = true;
         })
-        .catch(error => this.showError(error.message));
+        .catch(error => this.showError({ message: error.message }));
     },
   };
 </script>

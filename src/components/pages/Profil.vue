@@ -42,17 +42,16 @@ export default {
             const remoteRepo = gh.getRepo(this.user, repo.name);
             remoteRepo.getContents('master', 'garment-config.json', true)
             .then(() => {
-              // console.log(repo);
               this.addGarment(repo);
               this.dataIsLoaded = true;
-            }).catch(() => {
-              console.log('error');
+            }).catch((error) => {
+              this.showError({ message: error.message });
             });
           });
         }
       });
     } else {
-      console.log('error');
+      this.showError({ message: 'You need to be connected to view this page' });
     }
   },
   components: {
@@ -62,6 +61,7 @@ export default {
   methods: {
     ...mapActions({
       addGarment: 'addGarment',
+      showError: 'showError'
     }),
     deleteCard(id) {
       this.garments = _.reject(this.garments, { id });
