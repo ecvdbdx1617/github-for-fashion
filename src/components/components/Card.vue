@@ -42,51 +42,51 @@ export default {
       dialog: false,
     };
   },
-  computed: {
-    ...mapGetters({
-      token: 'token',
-      login: 'login',
-    }),
-  },
-  methods: {
-    ...mapActions({
+  computed: mapGetters({
+    token: 'token',
+    login: 'login',
+  }),
+  methods: Object.assign(
+    mapActions({
       showError: 'showError',
     }),
-    fork() {
-      const gh = new GitHub({
-        token: this.token,
-      });
-      const remoteRepo = gh.getRepo(this.data.creator, this.data.title);
-      remoteRepo.fork()
-      .then((response) => {
-        router.push({ name: 'Garment Detail', params: { user: this.login, repo: response.data.name } });
-      }).catch((error) => {
-        this.showError({ message: error });
-      });
+    {
+      fork() {
+        const gh = new GitHub({
+          token: this.token,
+        });
+        const remoteRepo = gh.getRepo(this.data.creator, this.data.title);
+        remoteRepo.fork()
+        .then((response) => {
+          router.push({ name: 'Garment Detail', params: { user: this.login, repo: response.data.name } });
+        }).catch((error) => {
+          this.showError({ message: error });
+        });
+      },
+      remove() {
+        const gh = new GitHub({
+          token: this.token,
+        });
+        const remoteRepo = gh.getRepo(this.data.creator, this.data.title);
+        remoteRepo.deleteRepo()
+        .then(() => {
+          this.$emit('cardDeleted', this.data.id);
+        }).catch((error) => {
+          this.showError({ message: error });
+        });
+      },
+      declineDialog() {
+        this.dialog = false;
+      },
+      confirmDialog() {
+        this.dialog = false;
+        this.remove();
+      },
+      showDialog() {
+        this.dialog = true;
+      },
     },
-    remove() {
-      const gh = new GitHub({
-        token: this.token,
-      });
-      const remoteRepo = gh.getRepo(this.data.creator, this.data.title);
-      remoteRepo.deleteRepo()
-      .then(() => {
-        this.$emit('cardDeleted', this.data.id);
-      }).catch((error) => {
-        this.showError({ message: error });
-      });
-    },
-    declineDialog() {
-      this.dialog = false;
-    },
-    confirmDialog() {
-      this.dialog = false;
-      this.remove();
-    },
-    showDialog() {
-      this.dialog = true;
-    },
-  },
+  ),
   components: {
     DialogBox,
   },

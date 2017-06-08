@@ -28,11 +28,9 @@
         },
       };
     },
-    computed: {
-      ...mapGetters({
-        token: 'token',
-      }),
-    },
+    computed: mapGetters({
+      token: 'token',
+    }),
     beforeCreate() {
       const gh = new Github({
         token: this.token,
@@ -75,11 +73,9 @@
         });
       });
     },
-    methods: {
-      ...mapActions({
-        showError: 'showError',
-      }),
-    },
+    methods: mapActions({
+      showError: 'showError',
+    }),
     components: {
       Card,
       MainCard,

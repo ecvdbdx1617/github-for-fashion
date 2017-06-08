@@ -55,66 +55,66 @@ export default {
       },
     };
   },
-  computed: {
-    ...mapGetters({
-      token: 'token',
-    }),
-  },
-  methods: {
-    ...mapActions({
+  computed: mapGetters({
+    token: 'token',
+  }),
+  methods: Object.assign(
+    mapActions({
       showError: 'showError',
     }),
-    sendGarment() {
-      const gh = new GitHub({
-        token: this.token,
-      });
+    {
+      sendGarment() {
+        const gh = new GitHub({
+          token: this.token,
+        });
 
-      const options = {
-        name: this.garment.title,
-      };
+        const options = {
+          name: this.garment.title,
+        };
 
-      const garmentConfigOptions = {
-        title: this.garment.title,
-        description: this.garment.description,
-        type: this.garment.type,
-        category: this.garment.category,
-        sizes: this.garment.sizes,
-        licence: this.garment.licence,
-        status: 'Created',
-      };
+        const garmentConfigOptions = {
+          title: this.garment.title,
+          description: this.garment.description,
+          type: this.garment.type,
+          category: this.garment.category,
+          sizes: this.garment.sizes,
+          licence: this.garment.licence,
+          status: 'Created',
+        };
 
-      const garmentConfig = 'garment-config.json';
+        const garmentConfig = 'garment-config.json';
 
-      const readMe = 'README.md';
+        const readMe = 'README.md';
 
 
-      return gh.getUser().getProfile()
-        .then((profileResponse) => {
-          const user = profileResponse.data.login;
-          return gh.getUser(user).createRepo(options)
-            .then((createResponse) => {
-              const repo = createResponse.data.name;
-              const remoteRepo = gh.getRepo(user, repo);
-              const description = `# ${repo} \n`
-                                + 'This repo was automatically generated and edited through the use of [this project](https://github.com/ecvdbdx1617/github-for-fashion). \n\n'
-                                + `You can view this garment project [here](http://localhost:8080/garment/${this.state.login}/${repo}) instead of browsing the files from Github.`;
-              return remoteRepo.writeFile('master', readMe, description, 'Init description', {})
-                .then(() => {
-                  remoteRepo.writeFile('master', garmentConfig, JSON.stringify(garmentConfigOptions), 'Garment project setup', {})
-                    .then(() => {
-                      this.$ga.event('Garment', 'create', `${user}/${this.garment.title}`);
+        return gh.getUser().getProfile()
+          .then((profileResponse) => {
+            const user = profileResponse.data.login;
+            return gh.getUser(user).createRepo(options)
+              .then((createResponse) => {
+                const repo = createResponse.data.name;
+                const remoteRepo = gh.getRepo(user, repo);
+                const description = `# ${repo} \n`
+                                  + 'This repo was automatically generated and edited through the use of [this project](https://github.com/ecvdbdx1617/github-for-fashion). \n\n'
+                                  + `You can view this garment project [here](http://localhost:8080/garment/${this.state.login}/${repo}) instead of browsing the files from Github.`;
+                return remoteRepo.writeFile('master', readMe, description, 'Init description', {})
+                  .then(() => {
+                    remoteRepo.writeFile('master', garmentConfig, JSON.stringify(garmentConfigOptions), 'Garment project setup', {})
+                      .then(() => {
+                        this.$ga.event('Garment', 'create', `${user}/${this.garment.title}`);
 
-                      router.push({ name: 'Garment Detail', params: { user, repo } });
-                    })
-                    .catch(error => this.showError({ message: error.message }));
-                })
-                .catch(error => this.showError({ message: error.message }));
-            })
-            .catch(error => this.showError({ message: error.message }));
-        })
-        .catch(error => this.showError({ message: error.message }));
+                        router.push({ name: 'Garment Detail', params: { user, repo } });
+                      })
+                      .catch(error => this.showError({ message: error.message }));
+                  })
+                  .catch(error => this.showError({ message: error.message }));
+              })
+              .catch(error => this.showError({ message: error.message }));
+          })
+          .catch(error => this.showError({ message: error.message }));
+      },
     },
-  },
+  ),
 };
 </script>
 

@@ -159,12 +159,10 @@
         types: Types,
       };
     },
-    computed: {
-      ...mapGetters({
-        token: 'token',
-        login: 'login',
-      }),
-    },
+    computed: mapGetters({
+      token: 'token',
+      login: 'login',
+    }),
     methods: {
       formatRepoDetails(repoDetails) {
         this.garment.creator = repoDetails.owner.login;
