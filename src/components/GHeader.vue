@@ -11,10 +11,10 @@
           <router-link :to="{name: 'create'}" class="material-icons">add</router-link>
         </section>
         <section v-if="state.name !== null" class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <span>{{ state.name }}</span>
+          <router-link :to="{ name: 'Profil', params: {user: state.login}}">{{ state.name }}</router-link>
         </section>
         <section v-if="state.name === null" class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <span>{{ state.login }}</span>
+          <router-link :to="{ name: 'Profil', params: {user: state.login}}">{{ state.login }}</router-link>
         </section>
         <section v-if="state.name || state.login" class="mdc-toolbar__section mdc-toolbar__section--align-start">
            <a @click.prevent="disconnect" href="#">Logout</a>
