@@ -1,26 +1,27 @@
 <template>
     <main class="garment-detail__container">
-        <form v-on:submit.prevent="sendGarment">
+        <form @submit.prevent="sendGarment">
             <label for="title">Title</label>
             <input id="title" type="text" name="title" v-model='garment.title'>
             <label for="category">Category</label>
             <select name="category" id="category" v-model='garment.category'>
-                <option value="" disabled selected hidden>Select a category</option>
+                <!--<option value="" disabled selected hidden>Select a category</option>-->
                 <option v-for="category in categories" :value="category" >{{category}}</option>
             </select>
             <label for="type">Type</label>
             <select name="type" id="type" v-model='garment.type'>
-                <option value="" disabled selected hidden>Select a type</option>
+                <!--<option value="" disabled selected hidden>Select a type</option>-->
                 <option v-for="type in types" :value="type" >{{type}}</option>
              </select>
             <div v-for="(size, index) in sizes">
                 <input type="checkbox" :name="size" :value="size" :id="size" v-model='garment.sizes'>
                 <label :for="size">{{size}}</label>
             </div>
+            <dropzone @fileContent='getFileContent'></dropzone>
             <label for="description">Description</label>
             <textarea name="description" id="description" v-model="garment.description"></textarea>
             <label for="licence">Licence</label>
-            <select name="licence" id="licence" v-model='garment.licence'>
+            <select name="licence" id="licence" v-model="garment.licence">
                 <option v-for="licence in licences" :value="licence">{{licence}}</option>
             </select>
             <input type="submit" value="GO">
@@ -33,8 +34,10 @@ import GitHub from 'github-api';
 
 import EventBus from '../../eventBus';
 import sessionStore from '../../loginStore';
+// import { handleFileSelect, handleDragOver } from '../../drag_drop';
 import router from '../../router';
 import * as constants from '../../constants';
+import Dropzone from '../components/Dropzone.vue';
 
 export default {
   name: 'create',
@@ -61,9 +64,13 @@ export default {
         description: '',
         type: '',
         licence: constants.CC_BY,
+        imgContent: [],
       },
       state: sessionStore.state,
     };
+  },
+  components: {
+    Dropzone,
   },
   methods: {
     sendGarment() {
@@ -97,6 +104,31 @@ export default {
             .then((createResponse) => {
               const repo = createResponse.data.name;
               const remoteRepo = gh.getRepo(user, repo);
+              if (this.garment.imgContent.length > 0) {
+                const filesTree = [];
+                this.garment.imgContent.forEach((image) => {
+                  filesTree.push({
+                    path: `images/${image.name}`,
+                    mode: '100644',
+                    type: 'blob',
+                    content: image.formattedSrc,
+                  });
+                });
+                remoteRepo.createTree(filesTree)
+                  .then((treeResponse) => {
+                    remoteRepo.listCommits({
+                      sha: 'master',
+                      per_page: 1,
+                    })
+                    .then((commitsResponse) => {
+                      remoteRepo.commit(commitsResponse.data[0].sha, treeResponse.data.sha, 'le chat du tri')
+                      .then((resp) => {
+                        remoteRepo.updateHead('heads/master', resp.data.sha, true);
+                      })
+                      .catch(error => EventBus.$emit('showError', error.message));
+                    });
+                  });
+              }
               return remoteRepo.writeFile('master', garmentConfig, JSON.stringify(garmentConfigOptions), 'Garment project setup', {})
                 .then(() => {
                   router.push({ name: 'Garment Detail', params: { user, repo } });
@@ -106,6 +138,9 @@ export default {
             .catch(error => EventBus.$emit('showError', error.message));
         })
         .catch(error => EventBus.$emit('showError', error.message));
+    },
+    getFileContent(items) {
+      this.garment.imgContent = items;
     },
   },
 };

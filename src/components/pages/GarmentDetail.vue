@@ -144,6 +144,14 @@
           value: repoContents.sizes.join(' '),
         });
       },
+      formatRepoImages(repoImages) {
+        repoImages.forEach((image) => {
+          this.garment.images.push({
+            url: image.download_url,
+            alt: image.name,
+          });
+        });
+      },
       formatRepoPullRequests(repoPullRequests) {
         this.garment.numberOfProposals = repoPullRequests.length;
       },
@@ -173,20 +181,25 @@
       const repoDetails = remoteRepo.getDetails();
       const repoContributorStats = remoteRepo.getContributorStats();
       const repoContents = remoteRepo.getContents('master', 'garment-config.json', true);
+      const repoImages = remoteRepo.getContents('master', 'images', true);
       const repoPullRequests = remoteRepo.listPullRequests();
       const repoReleases = remoteRepo.listReleases();
 
-      Promise.all([repoDetails, repoContributorStats, repoContents, repoPullRequests, repoReleases])
-        .then(([rDetails, rContributors, rContents, rPullRequests, rReleases]) => {
+      Promise.all([repoDetails, repoContributorStats, repoContents, repoImages, repoPullRequests, repoReleases]) // eslint-disable-line max-len
+        .then(([rDetails, rContributors, rContents, rImages, rPullRequests, rReleases]) => {
           this.formatRepoDetails(rDetails.data);
           this.formatRepoContributorStats(rContributors.data);
           this.formatRepoContents(rContents.data);
+          this.formatRepoImages(rImages.data);
           this.formatRepoPullRequests(rPullRequests.data);
           this.formatRepoReleases(rReleases.data);
 
           this.dataIsLoaded = true;
         })
-        .catch(error => this.showError(error.message));
+        .catch((error) => { // eslint-disable-line no-unused-vars
+          this.dataIsLoaded = true;
+          this.dataIsLoaded = true;
+        });
     },
   };
 </script>
