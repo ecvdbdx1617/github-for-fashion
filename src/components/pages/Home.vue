@@ -10,7 +10,6 @@
 <script>
   import { mapActions, mapGetters } from 'vuex';
   import Github from 'github-api';
-  import axios from 'axios';
 
   import Card from '../components/Card.vue';
   import MainCard from '../components/MainCard.vue';

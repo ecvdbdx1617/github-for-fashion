@@ -106,7 +106,7 @@ export default {
 
                       router.push({ name: 'Garment Detail', params: { user, repo } });
                     })
-                    .catch(error => EventBus.$emit('showError', error.message));
+                    .catch(error => this.showError({ message: error.message }));
                 })
                 .catch(error => this.showError({ message: error.message }));
             })

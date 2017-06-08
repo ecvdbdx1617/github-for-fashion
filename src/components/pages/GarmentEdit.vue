@@ -104,13 +104,11 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex';
   import moment from 'moment';
   import Github from 'github-api';
   import mime from 'mime-types';
   import _ from 'lodash';
-
-  import EventBus from '../../eventBus';
-  import LoginStore from '../../loginStore';
 
   import InfoBox from '../components/InfoBox.vue';
   import DownloadBox from '../components/DownloadBox.vue';
@@ -159,13 +157,15 @@
         categories: Categories,
         sizes: Sizes,
         types: Types,
-        state: LoginStore.state,
       };
     },
+    computed: {
+      ...mapGetters({
+        token: 'token',
+        login: 'login',
+      }),
+    },
     methods: {
-      showError(error) {
-        EventBus.$emit('showError', error);
-      },
       formatRepoDetails(repoDetails) {
         this.garment.creator = repoDetails.owner.login;
         this.garment.creation_date = repoDetails.created_at;
@@ -206,7 +206,7 @@
       },
       updateGarment() {
         const gh = new Github({
-          token: this.state.token,
+          token: this.token,
         });
 
         const garmentConfigOptions = {
@@ -231,9 +231,9 @@
           .then(() => {
             router.push({ name: 'Garment Detail', params: { user, repo } });
           })
-          .catch(error => EventBus.$emit('showError', error.message));
+          .catch(error => this.showError({ message: error.message }));
         })
-        .catch(error => EventBus.$emit('showError', error.message));
+        .catch(error => this.showError({ message: error.message }));
       },
     },
     filters: {
@@ -241,9 +241,9 @@
     },
     props: ['user', 'repo'],
     mounted() {
-      if (this.user === LoginStore.state.login) {
+      if (this.user === this.login) {
         const gh = new Github({
-          token: LoginStore.state.token,
+          token: this.token,
         });
 
         const remoteRepo = gh.getRepo(this.user, this.repo);
@@ -264,7 +264,7 @@
 
           this.dataIsLoaded = true;
         })
-        .catch(error => this.showError(error.message));
+        .catch(error => this.showError({ message: error.message }));
       } else {
         router.push({ name: 'Garment Detail', params: { user: this.user, repo: this.repo } });
       }

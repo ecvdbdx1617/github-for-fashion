@@ -110,12 +110,12 @@
           files: [],
         },
         dataIsLoaded: false,
-        login: LoginStore.state.login,
       };
     },
     computed: {
       ...mapGetters({
         token: 'token',
+        login: 'login',
       }),
     },
     methods: {
@@ -192,8 +192,6 @@
           this.formatRepoContents(rContents.data);
           this.formatRepoPullRequests(rPullRequests.data);
           this.formatRepoReleases(rReleases.data);
-
-          this.showError({ message: 'demo' });
 
           this.$ga.event('Garment', 'view', `${this.user}/${this.garment.title}`);
 
